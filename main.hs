@@ -18,4 +18,6 @@ uppercase = map toUpper
 isStartList s = last s == '['
 isEndList s = last s == ']'
 
+commaToSemicolen s = if (last s == ',') then (init s ++ ";") else s
+
 
