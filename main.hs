@@ -16,5 +16,6 @@ uppercase :: String -> String
 uppercase = map toUpper
 
 isStartList s = last s == '['
+isEndList s = last s == ']'
 
 
