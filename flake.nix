@@ -27,6 +27,7 @@
           default = pkgs.mkShell {
             buildInputs = (with pkgs; [
               ghc
+              cabal-install
               haskellPackages.haskell-language-server
             ]);
           };
