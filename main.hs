@@ -10,7 +10,6 @@ main = do
     putStr $ json2nix contents
     hClose handle
 
--- json2nix input = unlines $ map transformLine $ lines input
 json2nix :: String -> String
 json2nix input = let
   jsonLines = lines input
@@ -19,20 +18,24 @@ json2nix input = let
 
 data Context where
   Context :: {listLevel :: Int} -> Context
-
-data Line = ListStart String | ListEnd String | AttrSetStart String | AttrSetEnd String | AttrValue String | ListValue String
+  deriving Show
+  
+data Line = 
+  ListStart String | ListEnd String | AttrSetStart String | AttrSetEnd String | AttrValue String | ListValue String
+  deriving Show
 
 commaToSemicolen :: [Char] -> [Char]
 commaToSemicolen s = if last s == ',' then init s ++ ";" else s
 
+unwrapValue :: String -> String
 unwrapValue line = let
   parts = splitOn ":" line
   wrappedValue = head parts
   value = filter (/= '"') wrappedValue
-  unwrappedLine = value ++ " =" ++ (unwords $ tail parts)
-  in if length parts > 1 then unwrappedLine else line
-
--- transformLine line = unwrapValue $ commaToSemicolen line
+  unwrappedLine = value ++ " =" ++ unwords (tail parts)
+  in if length parts > 1 
+    then unwrappedLine 
+    else line
 
 removeSemicolen s = if last s == ';' then  init s else s
 
@@ -52,7 +55,9 @@ jsonLineToLine s c = let
     ']' -> ListEnd s
     '{' -> AttrSetStart s
     '}' -> AttrSetEnd s
-    _ -> if inList then AttrValue s else ListValue s
+    _ -> if inList 
+      then ListValue s 
+      else AttrValue s
 
 jsonLinesToLines :: [String] -> Context -> [Line]
 jsonLinesToLines [] _ = []
@@ -82,11 +87,11 @@ endOnNothing s = let
     _ -> s
 
 transformLine :: Line -> String
-transformLine (AttrSetStart s) = s
+transformLine (AttrSetStart s) = unwrapValue s
 transformLine (AttrSetEnd s) = endOnSemicolen s
-transformLine (ListStart s) = s
-transformLine (ListEnd s) = endOnSemicolen s
-transformLine (ListValue s) = endOnNothing s
-transformLine (AttrValue s) = endOnSemicolen s
+transformLine (ListStart s) = unwrapValue s
+transformLine (ListEnd s) = unwrapValue $ endOnSemicolen s
+transformLine (ListValue s) = unwrapValue $ endOnNothing s
+transformLine (AttrValue s) = unwrapValue $ endOnSemicolen s
 
 
