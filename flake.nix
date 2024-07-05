@@ -28,7 +28,14 @@
             buildInputs = (with pkgs; [
               ghc
               cabal-install
+              haskellPackages.split
+              haskellPackages.hoogle
+              haskellPackages.lsp
               haskellPackages.haskell-language-server
+              haskellPackages.apply-refact
+              haskellPackages.hlint
+              haskellPackages.stylish-haskell
+              haskellPackages.hasktags
             ]);
           };
         };
