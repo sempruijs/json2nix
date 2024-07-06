@@ -1,50 +1,57 @@
 {
-  description = "json2nix converter written in Haskell";
-
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    flake-parts.url = "github:hercules-ci/flake-parts";
+    haskell-flake.url = "github:srid/haskell-flake";
   };
-
-  outputs = inputs@{ flake-parts, ... }:
+  outputs = inputs@{ self, nixpkgs, flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
-      imports = [
-        # To import a flake module
-        # 1. Add foo to inputs
-        # 2. Add foo as a parameter to the outputs function
-        # 3. Add here: foo.flakeModule
+      systems = nixpkgs.lib.systems.flakeExposed;
+      imports = [ inputs.haskell-flake.flakeModule ];
 
-      ];
-      systems = [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" "x86_64-darwin" ];
-      perSystem = { config, self', inputs', pkgs, system, ... }: {
-        # Per-system attributes can be defined here. The self' and inputs'
-        # module parameters provide easy access to attributes of the same
-        # system.
+      perSystem = { self', pkgs, ... }: {
 
-        # Equivalent to  inputs'.nixpkgs.legacyPackages.hello;
-        packages.default = pkgs.hello;
+        # Typically, you just want a single project named "default". But
+        # multiple projects are also possible, each using different GHC version.
+        haskellProjects.default = {
+          # The base package set representing a specific GHC version.
+          # By default, this is pkgs.haskellPackages.
+          # You may also create your own. See https://community.flake.parts/haskell-flake/package-set
+          # basePackages = pkgs.haskellPackages;
 
-        devShells = {
-          default = pkgs.mkShell {
-            buildInputs = (with pkgs; [
-              ghc
-              cabal-install
-              haskellPackages.split
-              haskellPackages.hoogle
-              haskellPackages.lsp
-              haskellPackages.haskell-language-server
-              haskellPackages.apply-refact
-              haskellPackages.hlint
-              haskellPackages.stylish-haskell
-              haskellPackages.hasktags
-            ]);
+          # Extra package information. See https://community.flake.parts/haskell-flake/dependency
+          #
+          # Note that local packages are automatically included in `packages`
+          # (defined by `defaults.packages` option).
+          #
+          packages = {
+            # aeson.source = "1.5.0.0";      # Override aeson to a custom version from Hackage
+            # shower.source = inputs.shower; # Override shower to a custom source path
+          };
+          settings = {
+            #  aeson = {
+            #    check = false;
+            #  };
+            #  relude = {
+            #    haddock = false;
+            #    broken = false;
+            #  };
+          };
+
+          devShell = {
+            # Enabled by default
+            # enable = true;
+
+            # Programs you want to make available in the shell.
+            # Default programs can be disabled by setting to 'null'
+            # tools = hp: { fourmolu = hp.fourmolu; ghcid = null; };
+
+            hlsCheck.enable = pkgs.stdenv.isDarwin; # On darwin, sandbox is disabled, so HLS can use the network.
           };
         };
-      };
-      flake = {
-        # The usual flake attributes can be defined here, including system-
-        # agnostic ones like nixosModule and system-enumerating ones, although
-        # those are more easily expressed in perSystem.
 
+        # haskell-flake doesn't set the default package, but you can do it here.
+        packages.default = self'.packages.example;
       };
     };
 }
