@@ -3,19 +3,23 @@ import Data.Char
 import Data.List.Split
 
 main = do
+    (jsonFileName, nixFileName) <- getFileNames
+    handle <- openFile jsonFileName ReadMode
+    contents <- hGetContents handle
+    let nixContent = json2nix contents
+    writeFile nixFileName nixContent
+    hClose handle
+
+getFileNames = do
     putStrLn "--- step 1 of 2 ---"
     putStr "File name: "
-    fileName <- getLine
+    jsonFileName <- getLine
     putStrLn ""
     putStrLn "--- step 2 of 2 ---"
     putStrLn "Enter a name for the generated nix file"
     putStr "Nix file name: "
     nixFileName <- getLine
-    handle <- openFile fileName ReadMode
-    contents <- hGetContents handle
-    let nixContent = json2nix contents
-    writeFile nixFileName nixContent
-    hClose handle
+    return (jsonFileName, nixFileName)
 
 json2nix :: String -> String
 json2nix input = let
