@@ -1,9 +1,9 @@
 module Main where
 
 import System.IO
-import Data.Char
 import Data.List.Split
 
+main :: IO ()
 main = do
     (jsonFileName, nixFileName) <- getFileNames
     handle <- openFile jsonFileName ReadMode
@@ -12,6 +12,9 @@ main = do
     writeFile nixFileName nixContent
     hClose handle
 
+
+
+getFileNames :: IO (String, String)
 getFileNames = do
     putStrLn "--- step 1 of 2 ---"
     putStr "File name: "
@@ -53,13 +56,12 @@ unwrapValue line = let
   wrappedValue = head parts
   value = filter (/= '"') wrappedValue
   unwrappedLine = value ++ " =" ++ unwords (tail parts)
-  in if length parts > 1 
-    then unwrappedLine 
+  in if length parts > 1
+    then unwrappedLine
     else line
 
-removeSemicolen s = if last s == ';' then  init s else s
-
-initContext = Context { listLevel = 0 }
+initContext :: Context
+initContext = Context { listLevel = 0 };
 
 updateContext :: Line -> Context -> Context
 updateContext (ListEnd _) c = Context {listLevel = listLevel c - 1}
