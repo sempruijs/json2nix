@@ -1,9 +1,9 @@
 cabal-version:   3.0
-name:            example
+name:            json2nix
 version:         0.1.0.0
 license:         NONE
-author:          Joe
-maintainer:      joe@example.com
+author:          Sem Pruijs
+maintainer:      contact@pruijs.net
 build-type:      Simple
 
 common warnings

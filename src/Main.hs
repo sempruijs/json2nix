@@ -114,5 +114,3 @@ transformLine (ListEnd s) = unwrapValue $ endOnSemicolen s
 transformLine (ListValue s) = unwrapValue $ endOnNothing s
 transformLine (AttrValue s) = unwrapValue $ endOnSemicolen s
 
-
-
