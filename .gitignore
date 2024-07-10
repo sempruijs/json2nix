@@ -4,3 +4,5 @@ test.json
 main.o
 main.hi
 dist-newstyle
+/src/Main2.hi
+/src/Main2.o
