@@ -12,8 +12,6 @@ main = do
     writeFile nixFileName nixContent
     hClose handle
 
-
-
 getFileNames :: IO (String, String)
 getFileNames = do
     putStrLn "--- step 1 of 2 ---"

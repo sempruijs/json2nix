@@ -1,19 +1,23 @@
 module Main2 where
 
-data LineProperty = Start | End | Value
+data Value = NullValue | IntValue Int | FloatValue Float | BoolValue Bool | StringValue String | ArrayValue [Value] | ObjectValue [ObjectAttribute]
 
-data SetType = Attr | List
-
-data ListType = ListType {
-  lineProperty :: LineProperty,
-  listType :: ListType
+data ObjectAttribute = ObjectAttribute {
+  name :: String,
+  value :: Value
 }
 
-newtype JsonLine = JsonLine String
-newtype JsonLines = JsonLines [JsonLine]
+newtype JsonInput = JsonInput String
 
-newtype NixLine = NixLine String
-newtype NixLines = NixLines [NixLine]
+parseJson :: JsonInput -> Value
 
-json2nix :: JsonLines -> NixLines
-json2nix s = NixLines [NixLine "hello"]
+data ReadMode = NullMode | StringMode | IntMode | FloatMode | ObjectMode | ListMode
+
+charToReadMode :: Char -> ReadMode
+charToReadmode '{' = ObjectMode
+charToReadmode '[' = ListMode
+charToReadmode '"' = ListMode
+charToReadmode 't' = BoolMode
+charToReadmode 'f' = BoolMode
+charToReadmode 'n' = NullMode
+
