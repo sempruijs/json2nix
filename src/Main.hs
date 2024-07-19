@@ -1,7 +1,7 @@
 module Main where
 
-import System.IO
 import Data.List.Split
+import System.IO
 
 main :: IO ()
 main = do
@@ -24,7 +24,7 @@ getFileNames = do
     putStr ("Nix file name (" ++ nixFileNameSuggestion ++ "): ")
     nixFileName <- getLine
     let nixFileNameResult = if nixFileName == ""
-        then nixFileNameSuggestion 
+        then nixFileNameSuggestion
         else nixFileName
     return (jsonFileName, nixFileNameResult)
 
@@ -33,84 +33,40 @@ jsonFileNameToNixFileName s = let
   parts = splitOn "." s
   in head parts ++ ".nix"
 
-json2nix :: String -> String
-json2nix input = let
-  jsonLines = lines input
-  parsedLines = jsonLinesToLines jsonLines initContext
-  in unlines $ map transformLine parsedLines
+data Value = NullValue | IntValue Int | FloatValue Float | BoolValue Bool | StringValue String | ArrayValue [Value] | ObjectValue [ObjectAttribute]
 
-data Context = Context { listLevel :: Int }
+data ObjectAttribute = ObjectAttribute {
+  name :: String,
+  value :: Value
+}
 
-data Line =
-  ListStart String | ListEnd String | AttrSetStart String | AttrSetEnd String | AttrValue String | ListValue String
-  deriving Show
+type JsonInput = String
+type Nix = String
 
-commaToSemicolen :: [Char] -> [Char]
-commaToSemicolen s = if last s == ',' then init s ++ ";" else s
+json2nix :: JsonInput -> Nix
+json2nix s = let
+  value = parseJson s
+  in showAsNix value
 
-unwrapValue :: String -> String
-unwrapValue line = let
-  parts = splitOn ":" line
-  wrappedValue = head parts
-  value = filter (/= '"') wrappedValue
-  unwrappedLine = value ++ " =" ++ unwords (tail parts)
-  in if length parts > 1
-    then unwrappedLine
-    else line
+showAsNix :: Value -> Nix
+showAsNix v = case v of
+  StringValue a -> a
+  _ -> "waf"
 
-initContext :: Context
-initContext = Context { listLevel = 0 };
+type Index = Int
 
-updateContext :: Line -> Context -> Context
-updateContext (ListEnd _) c = Context {listLevel = listLevel c - 1}
-updateContext (ListStart _) c = Context {listLevel = listLevel c + 1}
-updateContext _ c = c
-
-jsonLineToLine :: String -> Context -> Line
-jsonLineToLine s c = let
-  inList = listLevel c > 0
-  lastChar = last s
-  in case lastChar of
-    '[' -> ListStart s
-    ']' -> ListEnd s
-    '{' -> AttrSetStart s
-    '}' -> AttrSetEnd s
-    _ -> if inList 
-      then ListValue s 
-      else AttrValue s
-
-jsonLinesToLines :: [String] -> Context -> [Line]
-jsonLinesToLines [] _ = []
-jsonLinesToLines [x] c = [jsonLineToLine x c]
-jsonLinesToLines (x:xs) c = let
-  line = jsonLineToLine x c
-  newContext = updateContext line c
-  in line : jsonLinesToLines xs newContext
-
-
-
-endOnSemicolen :: String -> String
-endOnSemicolen s = let
-  lastChar = last s
-  in case lastChar of
-    ',' -> init s ++ [';']
-    ';' -> s
-    _ -> s ++ [';']
-
-endOnNothing :: String -> String
-endOnNothing s = let
-  lastChar = last s
-  in case lastChar of
-    -- TODO: write as one
-    ',' -> init s
-    ';' -> init s
-    _ -> s
-
-transformLine :: Line -> String
-transformLine (AttrSetStart s) = unwrapValue s
-transformLine (AttrSetEnd s) = endOnSemicolen s
-transformLine (ListStart s) = unwrapValue s
-transformLine (ListEnd s) = unwrapValue $ endOnSemicolen s
-transformLine (ListValue s) = unwrapValue $ endOnNothing s
-transformLine (AttrValue s) = unwrapValue $ endOnSemicolen s
-
+parseJson :: JsonInput -> Value
+parseJson jsonInput =
+  let
+    lastIndex = length jsonInput
+    nextValue :: JsonInput -> Index -> (Value, Index)
+    nextValue input index = let
+      indexChar = input !! index
+      in if indexChar == ' '
+         then nextValue jsonInput (index + 1)
+         else case indexChar of
+                '\"' -> let
+                  value = (StringValue $ (splitOn "\"" input) !! 1)
+                  in (value, index)
+                _ -> (StringValue "bla", 0)
+  in fst (nextValue jsonInput 0)
