@@ -53,7 +53,8 @@ showAsNix :: Value -> Nix
 showAsNix v = case v of
   StringValue a -> a
   IntValue a -> show a
-  _ -> "waf"
+  NullValue -> "null"
+  _ -> "unsupported type"
 
 type Index = Int
 
@@ -70,6 +71,7 @@ parseJson jsonInput =
                 '\"' -> let
                   value = (StringValue $ (splitOn "\"" input) !! 1)
                   in (value, index)
+                'n' -> (NullValue, index + 4)
                 c -> if isDigit c
                   then let
                   number = words input !! 0
