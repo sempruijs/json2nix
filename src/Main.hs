@@ -2,6 +2,7 @@ module Main where
 
 import Data.List.Split
 import System.IO
+import Data.Char
 
 main :: IO ()
 main = do
@@ -51,6 +52,7 @@ json2nix s = let
 showAsNix :: Value -> Nix
 showAsNix v = case v of
   StringValue a -> a
+  IntValue a -> show a
   _ -> "waf"
 
 type Index = Int
@@ -68,5 +70,10 @@ parseJson jsonInput =
                 '\"' -> let
                   value = (StringValue $ (splitOn "\"" input) !! 1)
                   in (value, index)
-                _ -> (StringValue "bla", 0)
+                c -> if isDigit c
+                  then let
+                  number = words input !! 0
+                  in (IntValue (read number :: Int), index)
+                  else (StringValue "bla", index)
   in fst (nextValue jsonInput 0)
+
