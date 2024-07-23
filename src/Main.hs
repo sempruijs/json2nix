@@ -54,6 +54,7 @@ showAsNix v = case v of
   StringValue a -> a
   IntValue a -> show a
   NullValue -> "null"
+  ArrayValue xs -> "[\n" ++ unlines (map showAsNix xs) ++ "]"
   _ -> "unsupported type"
 
 type Index = Int
@@ -65,13 +66,27 @@ parseJson jsonInput =
     nextValue :: JsonInput -> Index -> (Value, Index)
     nextValue input index = let
       indexChar = input !! index
-      in if indexChar == ' '
+      in if indexChar == ' ' || indexChar == ','
          then nextValue jsonInput (index + 1)
          else case indexChar of
                 '\"' -> let
                   value = (StringValue $ (splitOn "\"" input) !! 1)
                   in (value, index)
                 'n' -> (NullValue, index + 4)
+                '[' -> let
+                  parseList :: JsonInput -> Index -> [Value] -> ([Value], Index)
+                  parseList input1 i values = let
+                    indexChar1 = input1 !! i
+                    in case indexChar1 of
+                      ' ' -> parseList input (i + 1) values
+                      ',' -> parseList input (i + 1) values
+                      ']' -> (values,index)
+                      _ -> let
+                        (value2, index2) = nextValue input1  i
+                        in parseList input1 index2  (values ++ [value2])
+                    in let
+                      (values3, index3) = parseList input index []
+                      in (ArrayValue values3, index3)
                 c -> if isDigit c
                   then let
                   number = words input !! 0
