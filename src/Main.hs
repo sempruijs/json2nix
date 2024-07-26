@@ -36,6 +36,15 @@ jsonFileNameToNixFileName s = let
 
 data Value = NullValue | IntValue Int | FloatValue Float | BoolValue Bool | StringValue String | ArrayValue [Value] | ObjectValue [ObjectAttribute]
 
+instance Show Value where
+  show (NullValue) = "null"
+  show (IntValue a) = show a
+  show (FloatValue a) = show a
+  show (StringValue a) = show a
+  show (BoolValue a) = show a
+  show (ArrayValue xs) = "[\n" ++ unlines (map showAsNix xs) ++ "]"
+  -- show (ObjectValue xs)
+
 data ObjectAttribute = ObjectAttribute {
   name :: String,
   value :: Value
