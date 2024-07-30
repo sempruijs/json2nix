@@ -77,9 +77,10 @@ parseJson jsonInput =
       in if indexChar == ' ' || indexChar == ','
          then nextValue jsonInput (index + 1)
          else case indexChar of
-                '\"' -> let
-                  value = (StringValue $ (splitOn "\"" input) !! 1)
-                  in (value, index)
+                '"' -> let
+                  valueString = (splitOn "\"" input) !! 1
+                  value = StringValue valueString
+                  in (value, (length valueString) + index + 1)
                 'n' -> (NullValue, index + 4)
                 '[' -> let
                   parseList :: JsonInput -> Index -> [Value] -> ([Value], Index)
@@ -90,15 +91,22 @@ parseJson jsonInput =
                       ',' -> parseList input (i + 1) values
                       ']' -> (values,index)
                       _ -> let
-                        (value2, index2) = nextValue input1  i
+                        (value2, index2) = nextValue input1  (i + 1)
                         in parseList input1 index2  (values ++ [value2])
                     in let
                       (values3, index3) = parseList input (index + 1) []
                       in (ArrayValue values3, index3)
                 c -> if isDigit c
                   then let
-                  number = words input !! 0
+                  number = head $ words input
                   in (IntValue (read number :: Int), index)
                   else (StringValue "bla", index)
   in fst (nextValue jsonInput 0)
+
+
+
+parseInt :: JsonInput -> Index -> (Int, Index)
+parseFloat :: JsonInput -> Index -> (Float, Index)
+parseString :: JsonInput -> Index -> (String, Index)
+
 
