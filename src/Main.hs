@@ -71,7 +71,6 @@ type Index = Int
 parseJson :: JsonInput -> Value
 parseJson jsonInput =
   let
-    lastIndex = length jsonInput
     nextValue :: JsonInput -> Index -> (Value, Index)
     nextValue input index = let
       indexChar = input !! index
