@@ -94,7 +94,7 @@ parseJson jsonInput =
                         (value2, index2) = nextValue input1  i
                         in parseList input1 index2  (values ++ [value2])
                     in let
-                      (values3, index3) = parseList input index []
+                      (values3, index3) = parseList input (index + 1) []
                       in (ArrayValue values3, index3)
                 c -> if isDigit c
                   then let
