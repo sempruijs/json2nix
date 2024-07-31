@@ -78,9 +78,8 @@ parseJson jsonInput =
          then nextValue jsonInput (index + 1)
          else case indexChar of
                 '"' -> let
-                  valueString = (splitOn "\"" input) !! 1
-                  value = StringValue valueString
-                  in (value, (length valueString) + index + 1)
+                  (value, newIndex) = parseString input index
+                  in (StringValue value, newIndex)
                 'n' -> (NullValue, index + 4)
                 '[' -> let
                   parseList :: JsonInput -> Index -> [Value] -> ([Value], Index)
@@ -105,8 +104,13 @@ parseJson jsonInput =
 
 
 
-parseInt :: JsonInput -> Index -> (Int, Index)
-parseFloat :: JsonInput -> Index -> (Float, Index)
+-- parseInt :: JsonInput -> Index -> (Int, Index)
+-- parseFloat :: JsonInput -> Index -> (Float, Index)
+
 parseString :: JsonInput -> Index -> (String, Index)
+parseString input i = let
+  value = (splitOn "\"" input) !! 1
+  in (value, (length value) + i + 2)
+
 
 
