@@ -84,13 +84,13 @@ parseJson jsonInput =
                 '[' -> let
                   parseList :: JsonInput -> Index -> [Value] -> ([Value], Index)
                   parseList input1 i values = let
-                    indexChar1 = input1 !! i
-                    in case indexChar1 of
-                      ' ' -> parseList input (i + 1) values
-                      ',' -> parseList input (i + 1) values
-                      ']' -> (values,index)
-                      _ -> let
-                        (value2, index2) = nextValue input1  (i + 1)
+                    nextChar = input1 !! (i)
+                    in case nextChar of
+                      ' ' -> parseList input1 (i + 1) values
+                      ',' -> parseList input1 (i + 1) values
+                      ']' -> (values, i + 1)
+                      _   -> let
+                        (value2, index2) = nextValue input1 (i)
                         in parseList input1 index2  (values ++ [value2])
                     in let
                       (values3, index3) = parseList input (index + 1) []
@@ -102,14 +102,13 @@ parseJson jsonInput =
                   else (StringValue ("unknown character to parse: " ++ [c]), index + 1)
   in fst (nextValue jsonInput 0)
 
+-- should be extended for float parsing
 parseInt :: JsonInput -> Index -> (Int, Index)
 parseInt input i = let
   numberString = takeWhile isDigit (drop i input)
   newIndex = i + length numberString
   number = read numberString :: Int
   in (number, newIndex)
-
--- parseFloat :: JsonInput -> Index -> (Float, Index)
 
 parseString :: JsonInput -> Index -> (String, Index)
 parseString input i = let
