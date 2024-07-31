@@ -97,20 +97,24 @@ parseJson jsonInput =
                       in (ArrayValue values3, index3)
                 c -> if isDigit c
                   then let
-                  number = head $ words input
-                  in (IntValue (read number :: Int), index)
-                  else (StringValue "bla", index)
+                    (number, newIndex) = parseInt input index
+                    in (IntValue number, newIndex)
+                  else (StringValue ("unknown character to parse: " ++ [c]), index + 1)
   in fst (nextValue jsonInput 0)
 
+parseInt :: JsonInput -> Index -> (Int, Index)
+parseInt input i = let
+  numberString = takeWhile isDigit (drop i input)
+  newIndex = i + length numberString
+  number = read numberString :: Int
+  in (number, newIndex)
 
-
--- parseInt :: JsonInput -> Index -> (Int, Index)
 -- parseFloat :: JsonInput -> Index -> (Float, Index)
 
 parseString :: JsonInput -> Index -> (String, Index)
 parseString input i = let
-  value = (splitOn "\"" input) !! 1
-  in (value, (length value) + i + 2)
+  value = splitOn "\"" input !! 1
+  in (value, length value + i + 2)
 
 
 
