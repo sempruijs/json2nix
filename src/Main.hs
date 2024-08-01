@@ -51,7 +51,7 @@ instance Show Value where
   show (StringValue a) = show a
   show (BoolValue a) = show a
   show (ArrayValue xs) = "[\n" ++ unlines (map showAsNix xs) ++ "]"
-  -- show (ObjectValue xs)
+  show (ObjectValue attrs) = "{" ++ unlines (map show attrs) ++ "}"
 
 data ObjectAttribute = ObjectAttribute String Value
 
@@ -94,6 +94,20 @@ parseJson jsonInput =
                   (value, newIndex) = parseString input index
                   in (StringValue value, newIndex)
                 'n' -> (NullValue, index + 4)
+                '{' -> let
+                  parseObjectValue :: JsonInput -> Index -> [ObjectAttribute] -> ([ObjectAttribute], Index)
+                  parseObjectValue input1 i attrs = let
+                    indexChar = input1 !! i
+                    in case indexChar of
+                      ' ' -> parseObjectValue input1 (i + 1) attrs
+                      ',' -> parseObjectValue input1 (i + 1) attrs
+                      '}' -> (attrs, i + 1)
+                      _   -> let
+                        (newAttr, newIndex) = parseObjectAttribute input1 i
+                        in parseObjectValue input1 newIndex (attrs ++ [newAttr])
+                    in let
+                      (attrs, newIndex) = parseObjectValue input (index + 1) []
+                      in (ObjectValue attrs, newIndex)
                 '[' -> let
                   parseList :: JsonInput -> Index -> [Value] -> ([Value], Index)
                   parseList input1 i values = let
