@@ -53,10 +53,10 @@ instance Show Value where
   show (ArrayValue xs) = "[\n" ++ unlines (map showAsNix xs) ++ "]"
   -- show (ObjectValue xs)
 
-data ObjectAttribute = ObjectAttribute {
-  name :: String,
-  value :: Value
-}
+data ObjectAttribute = ObjectAttribute String Value
+
+instance Show ObjectAttribute where
+  show (ObjectAttribute name value) = name ++ " = " ++ show value
 
 type JsonInput = String
 type Nix = String
