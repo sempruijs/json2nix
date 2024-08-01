@@ -73,7 +73,7 @@ parseJson :: JsonInput -> Value
 parseJson jsonInput =
   let
     nextValue :: JsonInput -> Index -> (Value, Index)
-    nextValue input index = trace ("DEBUG: index: " ++ show index ++ show input) (let
+    nextValue input index = let
       indexChar = input !! index
       in if indexChar == ' ' || indexChar == ','
          then nextValue jsonInput (index + 1)
@@ -85,7 +85,7 @@ parseJson jsonInput =
                 '[' -> let
                   parseList :: JsonInput -> Index -> [Value] -> ([Value], Index)
                   parseList input1 i values = let
-                    indexChar = trace ("DEBUG line 88 i: " ++ show i) (input1 !! i)
+                    indexChar = input1 !! i
                     in case indexChar of
                       ' ' -> parseList input1 (i + 1) values
                       ',' -> parseList input1 (i + 1) values
@@ -100,7 +100,7 @@ parseJson jsonInput =
                   then let
                     (number, newIndex) = parseInt input index
                     in (IntValue number, newIndex)
-                  else (StringValue ("unknown character to parse: " ++ [c]), index + 1))
+                  else (StringValue ("unknown character to parse: " ++ [c]), index + 1)
   in fst (nextValue jsonInput 0)
 
 -- should be extended for float parsing
@@ -112,10 +112,10 @@ parseInt input i = let
   in (number, newIndex)
 
 parseString :: JsonInput -> Index -> (String, Index)
-parseString input i = trace ("Debug parseString: " ++ show i) (let
+parseString input i = let
   startAtIndex = snd (splitAt (i + 1) input)
-  value = trace ("startAtIndex" ++ show startAtIndex) (takeWhile (/= '\"') startAtIndex)
-  in (value, length value + i + 2))
+  value = takeWhile (/= '\"') startAtIndex
+  in (value, length value + i + 2)
 
 
 
