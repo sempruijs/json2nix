@@ -89,7 +89,7 @@ parseJson jsonInput =
                     in case indexChar of
                       ' ' -> parseList input1 (i + 1) values
                       ',' -> parseList input1 (i + 1) values
-                      ']' -> (values, i)
+                      ']' -> (values, i + 1)
                       _   -> let
                         (value2, index2) = nextValue input1 i
                         in parseList input1 index2  (values ++ [value2])
