@@ -79,6 +79,11 @@ type Index = Int
 parseJson :: JsonInput -> Value
 parseJson jsonInput =
   let
+    parseObjectAttribute :: JsonInput -> Index -> (ObjectAttribute, Index)
+    parseObjectAttribute input i = let
+      (name, nextIndex) = parseObjectAttributeName input i
+      (value, newIndex) = nextValue input nextIndex
+      in (ObjectAttribute name value, newIndex)
     nextValue :: JsonInput -> Index -> (Value, Index)
     nextValue input index = let
       indexChar = input !! index
