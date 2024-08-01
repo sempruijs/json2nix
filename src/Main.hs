@@ -3,6 +3,7 @@ module Main where
 import Data.List.Split
 import System.IO
 import Data.Char
+import Debug.Trace
 
 main :: IO ()
 main = do
@@ -72,7 +73,7 @@ parseJson :: JsonInput -> Value
 parseJson jsonInput =
   let
     nextValue :: JsonInput -> Index -> (Value, Index)
-    nextValue input index = let
+    nextValue input index = trace ("DEBUG: index: " ++ show index ++ show input) (let
       indexChar = input !! index
       in if indexChar == ' ' || indexChar == ','
          then nextValue jsonInput (index + 1)
@@ -84,13 +85,13 @@ parseJson jsonInput =
                 '[' -> let
                   parseList :: JsonInput -> Index -> [Value] -> ([Value], Index)
                   parseList input1 i values = let
-                    nextChar = input1 !! (i)
-                    in case nextChar of
+                    indexChar = trace ("DEBUG line 88 i: " ++ show i) (input1 !! i)
+                    in case indexChar of
                       ' ' -> parseList input1 (i + 1) values
                       ',' -> parseList input1 (i + 1) values
-                      ']' -> (values, i + 1)
+                      ']' -> (values, i)
                       _   -> let
-                        (value2, index2) = nextValue input1 (i)
+                        (value2, index2) = nextValue input1 i
                         in parseList input1 index2  (values ++ [value2])
                     in let
                       (values3, index3) = parseList input (index + 1) []
@@ -99,7 +100,7 @@ parseJson jsonInput =
                   then let
                     (number, newIndex) = parseInt input index
                     in (IntValue number, newIndex)
-                  else (StringValue ("unknown character to parse: " ++ [c]), index + 1)
+                  else (StringValue ("unknown character to parse: " ++ [c]), index + 1))
   in fst (nextValue jsonInput 0)
 
 -- should be extended for float parsing
@@ -111,9 +112,10 @@ parseInt input i = let
   in (number, newIndex)
 
 parseString :: JsonInput -> Index -> (String, Index)
-parseString input i = let
-  value = splitOn "\"" input !! 1
-  in (value, length value + i + 2)
+parseString input i = trace ("Debug parseString: " ++ show i) (let
+  startAtIndex = snd (splitAt (i + 1) input)
+  value = trace ("startAtIndex" ++ show startAtIndex) (takeWhile (/= '\"') startAtIndex)
+  in (value, length value + i + 2))
 
 
 
