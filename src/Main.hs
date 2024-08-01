@@ -82,7 +82,7 @@ parseJson jsonInput =
     nextValue :: JsonInput -> Index -> (Value, Index)
     nextValue input index = let
       indexChar = input !! index
-      in if indexChar == ' ' || indexChar == ','
+      in if indexChar `elem` [' ', ',', ';']
          then nextValue jsonInput (index + 1)
          else case indexChar of
                 '"' -> let
@@ -124,5 +124,6 @@ parseString input i = let
   value = takeWhile (/= '\"') startAtIndex
   in (value, length value + i + 2)
 
-
+parseObjectAttributeName :: JsonInput -> Index -> (String, Index)
+parseObjectAttributeName input i = parseString input i
 
