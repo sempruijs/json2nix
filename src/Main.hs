@@ -35,7 +35,14 @@ jsonFileNameToNixFileName s = let
   parts = splitOn "." s
   in head parts ++ ".nix"
 
-data Value = NullValue | IntValue Int | FloatValue Float | BoolValue Bool | StringValue String | ArrayValue [Value] | ObjectValue [ObjectAttribute]
+data Value =
+  NullValue
+  | IntValue Int
+  | FloatValue Float
+  | BoolValue Bool
+  | StringValue String
+  | ArrayValue [Value]
+  | ObjectValue [ObjectAttribute]
 
 instance Show Value where
   show (NullValue) = "null"
