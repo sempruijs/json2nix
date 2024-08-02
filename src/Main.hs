@@ -49,7 +49,7 @@ instance Show Value where
   show (IntValue a) = show a
   show (FloatValue a) = show a
   show (StringValue a) = show a
-  show (BoolValue a) = show a
+  show (BoolValue a) = map toLower (show a)
   show (ArrayValue xs) = "[\n" ++ unlines (map showAsNix xs) ++ "]"
   show (ObjectValue attrs) = "{" ++ unlines (map show attrs) ++ "}"
 
@@ -71,6 +71,7 @@ showAsNix v = case v of
   StringValue a -> a
   IntValue a -> show a
   NullValue -> "null"
+  BoolValue a -> show a
   ArrayValue xs -> "[\n" ++ unlines (map showAsNix xs) ++ "]"
   ObjectValue xs -> "{\n" ++ unlines (map show xs) ++ "}"
 
@@ -95,6 +96,8 @@ parseJson jsonInput =
                   (value, newIndex) = parseString input index
                   in (StringValue value, newIndex)
                 'n' -> (NullValue, index + 4)
+                'f' -> (BoolValue False, index + 5)
+                't' -> (BoolValue True, index + 4)
                 '{' -> let
                   parseObjectValue :: JsonInput -> Index -> [ObjectAttribute] -> ([ObjectAttribute], Index)
                   parseObjectValue input1 i attrs = let
