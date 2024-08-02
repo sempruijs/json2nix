@@ -59,7 +59,7 @@ instance Show ObjectAttribute where
   show (ObjectAttribute name value) = name ++ " = " ++ show value
 
 showObjectAttr :: Int -> ObjectAttribute -> String
-showObjectAttr i (ObjectAttribute name value) = (take (i * indentSpace) $ repeat ' ') ++ name ++ " = " ++ (showAsNix i value)
+showObjectAttr i (ObjectAttribute name value) = indentSpace i ++ name ++ " = " ++ (showAsNix i value)
 
 type JsonInput = String
 type Nix = String
@@ -69,14 +69,17 @@ json2nix s = let
   value = parseJson s
   in showAsNix 0 value
 
+indentSpace :: Int -> String
+indentSpace i = take (i * 4) (repeat ' ')
+
 showAsNix :: Int -> Value -> Nix
 showAsNix i v = case v of
   StringValue a -> a
   IntValue a -> show a
   NullValue -> "null"
   BoolValue a -> show a
-  ArrayValue xs -> "[\n" ++ unlines (map (showAsNix i) xs) ++ "]"
-  ObjectValue xs -> "{\n" ++ unlines (map (showObjectAttr (i + 1)) xs) ++ (take (i * indentSpace) (repeat ' ')) ++ "}"
+  ArrayValue xs -> "[\n" ++ unlines (map (\v -> (indentSpace (i + 1)) ++ showAsNix (i + 1) v) xs) ++ (indentSpace i) ++ "]"
+  ObjectValue xs -> "{\n" ++ unlines (map (showObjectAttr (i + 1)) xs) ++ (indentSpace i) ++ "}"
 
 
 type Index = Int
@@ -145,9 +148,6 @@ parseInt input i = let
   newIndex = i + length numberString
   number = read numberString :: Int
   in (number, newIndex)
-
-
-indentSpace = 4
 
 parseString :: JsonInput -> Index -> (String, Index)
 parseString input i = let
