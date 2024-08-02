@@ -50,7 +50,7 @@ instance Show Value where
   show (FloatValue a) = show a
   show (StringValue a) = show a
   show (BoolValue a) = map toLower (show a)
-  show (ArrayValue xs) = "[\n" ++ unlines (map showAsNix xs) ++ "]"
+  show (ArrayValue xs) = "[\n" ++ unlines (map (showAsNix 0) xs) ++ "]"
   show (ObjectValue attrs) = "{" ++ unlines (map show attrs) ++ "}"
 
 data ObjectAttribute = ObjectAttribute String Value
@@ -58,22 +58,25 @@ data ObjectAttribute = ObjectAttribute String Value
 instance Show ObjectAttribute where
   show (ObjectAttribute name value) = name ++ " = " ++ show value
 
+showObjectAttr :: Int -> ObjectAttribute -> String
+showObjectAttr i (ObjectAttribute name value) = (take (i * indentSpace) $ repeat ' ') ++ name ++ " = " ++ (showAsNix i value)
+
 type JsonInput = String
 type Nix = String
 
 json2nix :: JsonInput -> Nix
 json2nix s = let
   value = parseJson s
-  in showAsNix value
+  in showAsNix 0 value
 
-showAsNix :: Value -> Nix
-showAsNix v = case v of
+showAsNix :: Int -> Value -> Nix
+showAsNix i v = case v of
   StringValue a -> a
   IntValue a -> show a
   NullValue -> "null"
   BoolValue a -> show a
-  ArrayValue xs -> "[\n" ++ unlines (map showAsNix xs) ++ "]"
-  ObjectValue xs -> "{\n" ++ unlines (map show xs) ++ "}"
+  ArrayValue xs -> "[\n" ++ unlines (map (showAsNix i) xs) ++ "]"
+  ObjectValue xs -> "{\n" ++ unlines (map (showObjectAttr (i + 1)) xs) ++ (take (i * indentSpace) (repeat ' ')) ++ "}"
 
 
 type Index = Int
@@ -143,9 +146,11 @@ parseInt input i = let
   number = read numberString :: Int
   in (number, newIndex)
 
+
+indentSpace = 4
+
 parseString :: JsonInput -> Index -> (String, Index)
 parseString input i = let
   startAtIndex = snd (splitAt (i + 1) input)
   value = takeWhile (/= '\"') startAtIndex
   in trace ("DEBUG: parse string index: " ++ show (length value + i + 2)) (value, length value + i + 2)
-
