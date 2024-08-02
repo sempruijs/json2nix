@@ -48,7 +48,7 @@ instance Show Value where
   show (NullValue) = "null"
   show (IntValue a) = show a
   show (FloatValue a) = show a
-  show (StringValue a) = show a
+  show (StringValue a) = "\"" ++ a ++ "\""
   show (BoolValue a) = map toLower (show a)
   show (ArrayValue xs) = "[\n" ++ unlines (map (showAsNix 0) xs) ++ "]"
   show (ObjectValue attrs) = "{" ++ unlines (map show attrs) ++ "}"
