@@ -70,7 +70,7 @@ json2nix s = let
   in showAsNix 0 value
 
 indentSpace :: Int -> String
-indentSpace i = take (i * 4) (repeat ' ')
+indentSpace i = take (i * 2) (repeat ' ')
 
 showAsNix :: Int -> Value -> Nix
 showAsNix i v = case v of
