@@ -146,6 +146,3 @@ parseString input i = let
   value = takeWhile (/= '\"') startAtIndex
   in trace ("DEBUG: parse string index: " ++ show (length value + i + 2)) (value, length value + i + 2)
 
-parseObjectAttributeName :: JsonInput -> Index -> (String, Index)
-parseObjectAttributeName input i = parseString input i
-
