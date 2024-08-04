@@ -74,7 +74,7 @@ indentSpace i = take (i * 2) (repeat ' ')
 
 showAsNix :: Int -> Value -> Nix
 showAsNix i v = case v of
-  StringValue a -> a
+  StringValue a -> "\"" ++ a ++ "\""
   IntValue a -> show a
   NullValue -> "null"
   BoolValue a -> show a
@@ -88,10 +88,10 @@ parseJson :: JsonInput -> Value
 parseJson jsonInput =
   let
     parseObjectAttribute :: JsonInput -> Index -> (ObjectAttribute, Index)
-    parseObjectAttribute input i = trace ("DEBUG: index is: " ++ show i) (let
+    parseObjectAttribute input i = let
       (name, nextIndex) = parseString input i
-      (value, newIndex) = trace ("DEBUG: nextIndex = " ++ show nextIndex) (nextValue input (nextIndex))
-      in ((ObjectAttribute name value), newIndex))
+      (value, newIndex) = nextValue input (nextIndex)
+      in ((ObjectAttribute name value), newIndex)
     nextValue :: JsonInput -> Index -> (Value, Index)
     nextValue input index = let
       indexChar = input !! index
@@ -114,7 +114,7 @@ parseJson jsonInput =
                       ',' -> parseObjectValue input1 (i + 1) attrs
                       '}' -> (attrs, i + 1)
                       _   -> let
-                        (newAttr, newIndex) = trace ("DEBUG: index parsed to parse objec attribute: " ++ show i) (parseObjectAttribute input1 i)
+                        (newAttr, newIndex) = parseObjectAttribute input1 i
                         in parseObjectValue input1 newIndex (attrs ++ [newAttr])
                     in let
                       (attrs, newIndex) = parseObjectValue input (index + 1) []
@@ -153,4 +153,4 @@ parseString :: JsonInput -> Index -> (String, Index)
 parseString input i = let
   startAtIndex = snd (splitAt (i + 1) input)
   value = takeWhile (/= '\"') startAtIndex
-  in trace ("DEBUG: parse string index: " ++ show (length value + i + 2)) (value, length value + i + 2)
+  in (value, length value + i + 2)
