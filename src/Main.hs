@@ -76,6 +76,7 @@ showAsNix :: Int -> Value -> Nix
 showAsNix i v = case v of
   StringValue a -> "\"" ++ a ++ "\""
   IntValue a -> show a
+  FloatValue a -> show a
   NullValue -> "null"
   BoolValue a -> show a
   ArrayValue xs -> "[\n" ++ unlines (map (\v -> (indentSpace (i + 1)) ++ showAsNix (i + 1) v) xs) ++ (indentSpace i) ++ "]"
@@ -135,19 +136,23 @@ parseJson jsonInput =
                       (values3, index3) = parseList input (index + 1) []
                       in (ArrayValue values3, index3)
                 c -> if isDigit c
-                  then let
-                    (number, newIndex) = parseInt input index
-                    in (IntValue number, newIndex)
+                  then parseNumber input index
                   else (StringValue ("unknown character to parse: " ++ [c]), index + 1)
   in fst (nextValue jsonInput 0)
 
 -- should be extended for float parsing
-parseInt :: JsonInput -> Index -> (Int, Index)
-parseInt input i = let
-  numberString = takeWhile isDigit (drop i input)
+parseNumber :: JsonInput -> Index -> (Value, Index)
+parseNumber input i = let
+  numberString = takeWhile (\c -> isDigit c || c == '.') (drop i input)
   newIndex = i + length numberString
-  number = read numberString :: Int
-  in (number, newIndex)
+  value = if '.' `elem` numberString
+    then let
+    float = read numberString :: Float
+    in FloatValue float
+    else let
+    int = read numberString :: Int
+    in IntValue int
+  in (value, newIndex)
 
 parseString :: JsonInput -> Index -> (String, Index)
 parseString input i = let
