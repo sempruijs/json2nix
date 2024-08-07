@@ -164,6 +164,7 @@ parseString input i = let
 
 
 takeWhileInString :: String -> String
+takeWhileInString ['\"'] = ""
 takeWhileInString ('\\':b:xs) = '\\' : b : takeWhileInString xs
-takeWhileInString (x:'\"':_) = x : []
+takeWhileInString (x:'\"':_) = [x]
 takeWhileInString (x:xs) = x : takeWhileInString xs
