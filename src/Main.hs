@@ -18,12 +18,14 @@ getFileNames :: IO (String, String)
 getFileNames = do
     putStrLn "--- step 1 of 2 ---"
     putStr "File name: "
+    hFlush stdout
     jsonFileName <- getLine
     putStrLn ""
     let nixFileNameSuggestion = jsonFileNameToNixFileName jsonFileName
     putStrLn "--- step 2 of 2 ---"
     putStrLn "Enter a name for the generated nix file"
     putStr ("Nix file name (" ++ nixFileNameSuggestion ++ "): ")
+    hFlush stdout
     nixFileName <- getLine
     let nixFileNameResult = if nixFileName == ""
         then nixFileNameSuggestion
