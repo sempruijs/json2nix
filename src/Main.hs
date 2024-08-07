@@ -157,5 +157,11 @@ parseNumber input i = let
 parseString :: JsonInput -> Index -> (String, Index)
 parseString input i = let
   startAtIndex = snd (splitAt (i + 1) input)
-  value = takeWhile (/= '\"') startAtIndex
+  value = takeWhileInString startAtIndex
   in (value, length value + i + 2)
+
+
+takeWhileInString :: String -> String
+takeWhileInString ('\\':b:xs) = '\\' : b : takeWhileInString xs
+takeWhileInString (x:'\"':_) = x : []
+takeWhileInString (x:xs) = x : takeWhileInString xs
