@@ -1,8 +1,10 @@
 # json2nix
 
-A json to nix converter written in Haskell
+A json to nix converter written in Haskell.
+You can use this easily with a flake.
+Unformatted json is also supported.
 
-## usage
+## Usage
 
 If you have something like this:
 
@@ -53,14 +55,17 @@ nix run github:sempruijs/json2nix
 ```
 
 This will install the required tools.
-json2nix will ask two question:
+json2nix will ask two questions:
 
-1. Choose a file path
-2. Choose a file name for nix.
+1. Choose a file path.
+This could be something like: ```config.json```.
 
-## contributing
+2. Choose a file name for the new nix file.
+You can type something or hit enter for the suggestion.
+This would be something like: ```config.nix```
 
-json2nix is written in Haskell.
-If you find a bug please submit an issue or pull sequest.
+## Contributing
+
+If you find a bug please submit [an issue](https://github.com/sempruijs/json2nix/issues) or [pull request](https://github.com/sempruijs/json2nix/pulls).
 
 
