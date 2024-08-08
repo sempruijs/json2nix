@@ -68,4 +68,6 @@ This would be something like: ```config.nix```
 
 If you find a bug please submit [an issue](https://github.com/sempruijs/json2nix/issues) or [pull request](https://github.com/sempruijs/json2nix/pulls).
 
+MIT license
+
 
