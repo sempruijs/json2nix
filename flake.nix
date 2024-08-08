@@ -1,5 +1,5 @@
 {
-  description = "A json to nix converter wirtten in Haskell";
+  description = "A json to nix converter written in Haskell";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
