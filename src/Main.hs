@@ -80,7 +80,7 @@ showAsNix i v = case v of
   IntValue a -> show a
   FloatValue a -> show a
   NullValue -> "null"
-  BoolValue a -> show a
+  BoolValue a -> map toLower (show a)
   ArrayValue xs -> "[\n" ++ unlines (map (\v -> (indentSpace (i + 1)) ++ showAsNix (i + 1) v) xs) ++ (indentSpace i) ++ "]"
   ObjectValue xs -> "{\n" ++ unlines (map (showObjectAttr (i + 1)) xs) ++ (indentSpace i) ++ "}"
 
