@@ -107,7 +107,7 @@ parseJson jsonInput =
     nextValue :: JsonInput -> Index -> (Value, Index)
     nextValue input index = let
       indexChar = input !! index
-      in if indexChar `elem` [' ', ',', ':', '\n', ';']
+      in if indexChar `elem` [' ', ',', ':', '\n', '\t', '\v', '\r', ';']
          then nextValue jsonInput (index + 1)
          else case indexChar of
                 '"' -> let
@@ -123,6 +123,9 @@ parseJson jsonInput =
                     in case indexChar of
                       ' ' -> parseObjectValue input1 (i + 1) attrs
                       '\n' -> parseObjectValue input1 (i + 1) attrs
+                      '\t' -> parseObjectValue input1 (i + 1) attrs
+                      '\v' -> parseObjectValue input1 (i + 1) attrs
+                      '\r' -> parseObjectValue input1 (i + 1) attrs
                       ',' -> parseObjectValue input1 (i + 1) attrs
                       '}' -> (attrs, i + 1)
                       _   -> let
@@ -136,9 +139,11 @@ parseJson jsonInput =
                   parseList input1 i values = let
                     indexChar = input1 !! i
                     in case indexChar of
-                      ' ' -> parseList input1 (i + 1) values
-                      ',' -> parseList input1 (i + 1) values
+                      ' '  -> parseList input1 (i + 1) values
+                      ','  -> parseList input1 (i + 1) values
                       '\n' -> parseList input1 (i + 1) values
+                      '\t' -> parseList input1 (i + 1) values
+                      '\v' -> parseList input1 (i + 1) values
                       ']' -> (values, i + 1)
                       _   -> let
                         (value2, index2) = nextValue input1 i
