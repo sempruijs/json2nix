@@ -84,7 +84,9 @@ showAsNix i v = case v of
   ArrayValue xs -> case xs of
     [] -> "[]"
     _  -> "[\n" ++ unlines (map (\v -> (indentSpace (i + 1)) ++ showAsNix (i + 1) v) xs) ++ (indentSpace i) ++ "]"
-  ObjectValue xs -> "{\n" ++ unlines (map (showObjectAttr (i + 1)) xs) ++ (indentSpace i) ++ "}"
+  ObjectValue xs -> case xs of
+    [] -> "{}"
+    _  -> "{\n" ++ unlines (map (showObjectAttr (i + 1)) xs) ++ (indentSpace i) ++ "}"
 
 
 type Index = Int
