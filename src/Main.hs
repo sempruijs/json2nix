@@ -61,7 +61,12 @@ instance Show ObjectAttribute where
   show (ObjectAttribute name value) = name ++ " = " ++ show value
 
 showObjectAttr :: Int -> ObjectAttribute -> String
-showObjectAttr i (ObjectAttribute name value) = indentSpace i ++ name ++ " = " ++ (showAsNix i value) ++ ";"
+showObjectAttr i (ObjectAttribute name value) = let
+  startsWithDigit = isDigit $ head name
+  newName = if startsWithDigit
+    then "\"" ++ name ++ "\""
+    else name
+  in indentSpace i ++ newName ++ " = " ++ (showAsNix i value) ++ ";"
 
 type JsonInput = String
 type Nix = String
