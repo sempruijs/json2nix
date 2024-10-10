@@ -60,10 +60,12 @@ data ObjectAttribute = ObjectAttribute String Value
 instance Show ObjectAttribute where
   show (ObjectAttribute name value) = name ++ " = " ++ show value
 
+shouldQuoteKey :: String -> Bool
+shouldQuoteKey key = not (all (\c -> isAlphaNum c || c == '_' || c == '-') key)
+
 showObjectAttr :: Int -> ObjectAttribute -> String
 showObjectAttr i (ObjectAttribute name value) = let
-  startsWithDigit = isDigit $ head name
-  newName = if startsWithDigit
+  newName = if shouldQuoteKey name
     then "\"" ++ name ++ "\""
     else name
   in indentSpace i ++ newName ++ " = " ++ (showAsNix i value) ++ ";"

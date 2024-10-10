@@ -23,7 +23,8 @@ If you have something like this:
             "age": 19,
         }
     ],
-    "favorite_movie": null
+    "favorite_movie": null,
+    "(some)%wild;key": 5
 }
 ```
 
@@ -36,7 +37,7 @@ And you want something like this:
   length_in_meters = 1.8;
   best_friends = [
     {
-      name = "Bob";
+      name = "bob";
       age = 19;
     }
     {
@@ -45,6 +46,7 @@ And you want something like this:
     }
   ];
   favorite_movie = null;
+  "(some)%wild;key" = 5;
 }
 ```
 
