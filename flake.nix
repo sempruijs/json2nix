@@ -54,6 +54,32 @@
 
         # haskell-flake doesn't set the default package, but you can do it here.
         packages.default = self'.packages.json2nix;
+        packages.yaml2nix = pkgs.writeShellScriptBin "yaml2nix" ''
+          cmd="${pkgs.yq}/bin/yq"
+          if [ -n "$1" ] && [ "$1" != "-" ]; then
+            cmd="$cmd \"$1\""
+          fi
+
+          cmd="$cmd | ${self'.packages.json2nix}/bin/json2nix"
+          if [ -n "$2" ]; then
+            cmd="$cmd - \"$2\""
+          fi
+
+          eval $cmd
+        '';
+        packages.toml2nix = pkgs.writeShellScriptBin "toml2nix" ''
+          cmd="${pkgs.yq}/bin/tomlq"
+          if [ -n "$1" ] && [ "$1" != "-" ]; then
+            cmd="$cmd \"$1\""
+          fi
+
+          cmd="$cmd | ${self'.packages.json2nix}/bin/json2nix"
+          if [ -n "$2" ]; then
+            cmd="$cmd - \"$2\""
+          fi
+
+          eval $cmd
+        '';
       };
     };
 }
