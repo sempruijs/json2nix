@@ -58,7 +58,10 @@ instance Show Value where
 data ObjectAttribute = ObjectAttribute String Value
 
 instance Show ObjectAttribute where
-  show (ObjectAttribute name value) = name ++ " = " ++ show value
+  show (ObjectAttribute name value) = showName name ++ " = " ++ show value
+
+showName :: String -> String
+showName name = if all isDigit name then "\"" ++ name ++ "\"" else name
 
 shouldQuoteKey :: String -> Bool
 shouldQuoteKey key = not (all (\c -> isAlphaNum c || c == '_' || c == '-') key)
