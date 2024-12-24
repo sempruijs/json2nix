@@ -24,7 +24,9 @@ If you have something like this:
         }
     ],
     "favorite_movie": null,
-    "(some)%wild;key": 5
+    "(some)%wild;key": 5,
+    "1": [],
+    "2": []
 }
 ```
 
@@ -47,6 +49,8 @@ And you want something like this:
   ];
   favorite_movie = null;
   "(some)%wild;key" = 5;
+  "1" = [];
+  "2" = [];
 }
 ```
 

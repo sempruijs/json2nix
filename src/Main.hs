@@ -58,19 +58,19 @@ instance Show Value where
 data ObjectAttribute = ObjectAttribute String Value
 
 instance Show ObjectAttribute where
-  show (ObjectAttribute name value) = showName name ++ " = " ++ show value
+  show (ObjectAttribute name value) = name ++ " = " ++ show value
 
 showName :: String -> String
 showName name = if all isDigit name then "\"" ++ name ++ "\"" else name
 
 shouldQuoteKey :: String -> Bool
-shouldQuoteKey key = not (all (\c -> isAlphaNum c || c == '_' || c == '-') key)
+shouldQuoteKey key = not (all (\c -> isAlphaNum c || c == '_' || c == '-') key) || all isDigit key
 
 showObjectAttr :: Int -> ObjectAttribute -> String
 showObjectAttr i (ObjectAttribute name value) = let
   newName = if shouldQuoteKey name
     then "\"" ++ name ++ "\""
-    else name
+    else showName name
   in indentSpace i ++ newName ++ " = " ++ (showAsNix i value) ++ ";"
 
 type JsonInput = String
