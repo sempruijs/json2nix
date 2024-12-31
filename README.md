@@ -1,6 +1,6 @@
 # json2nix
 
-A json to nix converter written in Haskell.
+A json/yaml/toml to nix converter written in Haskell.
 You can use this easily with a flake.
 Unformatted json is also supported.
 
@@ -69,6 +69,19 @@ This could be something like: ```config.json```.
 2. Choose a file name for the new nix file.
 You can type something or hit enter for the suggestion.
 This would be something like: ```config.nix```
+
+## YAML and TOML
+
+By virtue of [yq](https://github.com/kislyuk/yq), this flake also contains two packages `yaml2nix` and `toml2nix` that can be used just like `json2nix`:
+
+```shell
+nix run github:sempruijs/json2nix#yaml2nix [inputfile] [output]
+```
+
+```shell
+nix run github:sempruijs/json2nix#toml2nix [inputfile] [output]
+```
+
 
 ## Contributing
 
