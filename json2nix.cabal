@@ -9,7 +9,7 @@ build-type:      Simple
 common warnings
     ghc-options: -Wall
 
-executable example
+executable json2nix
     import:           warnings
     main-is:          Main.hs
     build-depends:    base,
