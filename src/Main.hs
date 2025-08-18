@@ -64,7 +64,7 @@ showName :: String -> String
 showName name = if all isDigit name then "\"" ++ name ++ "\"" else name
 
 shouldQuoteKey :: String -> Bool
-shouldQuoteKey key = not (all (\c -> isAlphaNum c || c == '_' || c == '-') key) || all isDigit key
+shouldQuoteKey key = not (all (\c -> isAlphaNum c || c == '_' || c == '-') key) || all isDigit key || (not (null key) && isDigit (head key))
 
 showObjectAttr :: Int -> ObjectAttribute -> String
 showObjectAttr i (ObjectAttribute name value) = let
