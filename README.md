@@ -57,18 +57,10 @@ And you want something like this:
 You can do so by enabling nix flakes and run the following command in your shell:
 
 ```shell
-nix run github:sempruijs/json2nix
+nix run github:sempruijs/json2nix [inputfile] [output]
 ```
 
-This will install the required tools.
-json2nix will ask two questions:
-
-1. Choose a file path.
-This could be something like: ```config.json```.
-
-2. Choose a file name for the new nix file.
-You can type something or hit enter for the suggestion.
-This would be something like: ```config.nix```
+Both arguments may be omitted or set to "-" in which case json2nix will read from stdin resp. write to stdout.
 
 ## Contributing
 

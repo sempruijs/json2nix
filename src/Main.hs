@@ -3,39 +3,35 @@ module Main where
 import Data.List.Split
 import System.IO
 import Data.Char
-import Debug.Trace
+import System.Environment (getArgs)
 
 main :: IO ()
 main = do
-    (jsonFileName, nixFileName) <- getFileNames
-    handle <- openFile jsonFileName ReadMode
-    contents <- hGetContents handle
-    let nixContent = json2nix contents
-    writeFile nixFileName nixContent
-    hClose handle
+  (inputSource, outputDest) <- parseArgs
 
-getFileNames :: IO (String, String)
-getFileNames = do
-    putStrLn "--- step 1 of 2 ---"
-    putStr "File name: "
-    hFlush stdout
-    jsonFileName <- getLine
-    putStrLn ""
-    let nixFileNameSuggestion = jsonFileNameToNixFileName jsonFileName
-    putStrLn "--- step 2 of 2 ---"
-    putStrLn "Enter a name for the generated nix file"
-    putStr ("Nix file name (" ++ nixFileNameSuggestion ++ "): ")
-    hFlush stdout
-    nixFileName <- getLine
-    let nixFileNameResult = if nixFileName == ""
-        then nixFileNameSuggestion
-        else nixFileName
-    return (jsonFileName, nixFileNameResult)
+  contents <- case inputSource of
+    Nothing       -> getContents
+    Just "-"      -> getContents
+    Just fileName -> readFile fileName
 
-jsonFileNameToNixFileName :: String -> String
-jsonFileNameToNixFileName s = let
-  parts = splitOn "." s
-  in head parts ++ ".nix"
+  let nixContent = json2nix contents
+
+  case outputDest of
+    Nothing       -> case inputSource of
+                        Just fileName -> writeFile fileName nixContent
+                        Just "-"      -> putStrLn nixContent
+                        Nothing       -> putStrLn nixContent
+    Just "-"      -> putStrLn nixContent
+    Just fileName -> writeFile fileName nixContent
+
+parseArgs :: IO (Maybe String, Maybe String)
+parseArgs = do
+  args <- getArgs
+  case args of
+    [] -> return (Nothing, Nothing)
+    [inputSource] -> return (Just inputSource, Nothing)
+    [inputSource, outputFileName] -> return (Just inputSource, Just outputFileName)
+    _ -> error "Usage: program [inputFile] [outputFile]"
 
 data Value =
   NullValue
